@@ -5,6 +5,7 @@ import {
   LinearProgress,
   useTheme,
   useMediaQuery,
+  CircularProgress,
 } from "@mui/material";
 import FlipClockCountdown from "@leenguyen/react-flip-clock-countdown";
 import "@leenguyen/react-flip-clock-countdown/dist/index.css";
@@ -15,6 +16,7 @@ const MissionSection = ({ setFormData }) => {
   const [items, setItems] = useState([]);
   const [raised, setRaised] = useState(0);
   const [goal, setGoal] = useState(0);
+  const [loading, setLoading] = useState(true);
 
   const theme = useTheme();
   const isSmallScreen = useMediaQuery(theme.breakpoints.down("sm"));
@@ -36,7 +38,6 @@ const MissionSection = ({ setFormData }) => {
         const fetchedItems = res.data;
 
         setItems(fetchedItems);
-
         const totalRaised = fetchedItems.reduce(
           (sum, item) => sum + (item.amountRaised || 0),
           0
@@ -50,6 +51,8 @@ const MissionSection = ({ setFormData }) => {
         setGoal(totalGoal);
       } catch (err) {
         console.error("Failed to fetch items", err);
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -207,17 +210,44 @@ const MissionSection = ({ setFormData }) => {
           mx: 1,
         }}
       >
-        {items?.map((item, idx) => (
-          <ItemCard
-            key={idx}
-            image={item?.image || "/components/default.jpg"}
-            title={item?.name}
-            contributors={item?.contributors}
-            goal={item?.price}
-            raised={item?.amountRaised}
-            onDonateClick={handleDonateClick}
-          />
-        ))}
+        {loading ? (
+          <Box
+            sx={{
+              position: "absolute",
+              width: "100%",
+              left: 0,
+              right: 0,
+              marginTop: -2,
+            }}
+          >
+            <CircularProgress
+              size={50}
+              thickness={3}
+              sx={{ color: "#cc9900" }}
+            />
+
+            <Typography
+              variant="h6"
+              sx={{ fontSize: 20, mt: 2, fontWeight: "normal", opacity: 0.7 }}
+            >
+              Fetching items...
+            </Typography>
+          </Box>
+        ) : (
+          <>
+            {items?.map((item, idx) => (
+              <ItemCard
+                key={idx}
+                image={item?.image || "/components/default.jpg"}
+                title={item?.name}
+                contributors={item?.contributors}
+                goal={item?.price}
+                raised={item?.amountRaised}
+                onDonateClick={handleDonateClick}
+              />
+            ))}
+          </>
+        )}
       </Box>
     </Box>
   );

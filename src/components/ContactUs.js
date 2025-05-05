@@ -14,7 +14,7 @@ const ContactUs = () => {
   const [snackOpen, setSnackOpen] = useState(false);
 
   const phoneNumber = "07030707996"; // Replace with your actual number
-  const whatsappLink = `https://wa.me/2348012345678`; // International format
+  const whatsappLink = `https://wa.me/2347030707996`; // International format
 
   const handleCopyPhone = () => {
     navigator.clipboard.writeText(phoneNumber);
