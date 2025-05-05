@@ -1,4 +1,6 @@
 import React, { useState } from "react";
+import axios from "axios";
+import { CircularProgress } from "@mui/material";
 import {
   Grid,
   TextField,
@@ -18,27 +20,27 @@ import ContactUs from "./ContactUs";
 
 const items = [
   "No preference",
-  "Mass Box",
-  "Chasubles",
-  "Alb",
-  "Sick Call Bag",
+  "Alb x2",
+  "Habit material",
+  "Chasubles X4 liturgical colors",
+  "Mass box",
+  "Sick call bag",
+  "Small monstrance",
   "Igbo Missal",
-  "Christian Rite",
+  "The Christrain rite (two volumes)",
+  "Book of blessings",
+  "Igbo lectionary",
+  "Roman collar",
+  "Sacred linen (X2)",
   "Souvenirs",
+  "Book of the gospel",
+  "Personal Items",
 ];
 
-export default function DonationForm() {
-  const [formData, setFormData] = useState({
-    name: "",
-    anonymous: false,
-    phone: "",
-    item: "No preference",
-    amount: "",
-    receipt: null,
-    prayer: "",
-  });
-
+export default function DonationForm({ formData, setFormData }) {
   const [snackOpen, setSnackOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [snackMessage, setSnackMessage] = useState("Copied!");
 
   const handleChange = (e) => {
     const { name, value, type, checked, files } = e.target;
@@ -49,14 +51,55 @@ export default function DonationForm() {
     }));
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    console.log("Donation submitted:", formData);
-  };
-
   const handleCopy = () => {
     navigator.clipboard.writeText("3180848589");
     setSnackOpen(true);
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+
+    try {
+      const data = new FormData();
+      if (!formData.anonymous) data.append("name", formData.name);
+      if (formData.phone) data.append("phone", formData.phone);
+      data.append("item", formData.item || "No preference");
+      data.append("amount", formData.amount);
+      data.append("message", formData.prayer || "");
+      if (formData.receipt) data.append("proofOfPayment", formData.receipt);
+
+      await axios.post(
+        "https://fundraisebackend.onrender.com/api/donate",
+        data,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+
+      setFormData({
+        name: "",
+        anonymous: false,
+        phone: "",
+        item: "No preference",
+        amount: "",
+        receipt: null,
+        prayer: "",
+      });
+
+      setSnackMessage(
+        "Thank you for your donation. Your transaction is under review."
+      );
+      setSnackOpen(true);
+    } catch (err) {
+      console.error("Donation failed:", err);
+      setSnackMessage("Something went wrong. Please try again.");
+      setSnackOpen(true);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -235,7 +278,9 @@ export default function DonationForm() {
               }}
             >
               <Button
+                type="submit"
                 variant="outlined"
+                disabled={loading}
                 sx={{
                   borderColor: "#cc9900",
                   color: "#cc9900",
@@ -247,7 +292,11 @@ export default function DonationForm() {
                   "&:hover": { backgroundColor: "#fef9e7" },
                 }}
               >
-                Donate
+                {loading ? (
+                  <CircularProgress size={20} color="inherit" />
+                ) : (
+                  "Donate"
+                )}
               </Button>
             </Box>
           </Grid>
@@ -258,6 +307,13 @@ export default function DonationForm() {
           autoHideDuration={2500}
           onClose={() => setSnackOpen(false)}
           message="Copied!"
+          anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+        />
+        <Snackbar
+          open={snackOpen}
+          autoHideDuration={4000}
+          onClose={() => setSnackOpen(false)}
+          message={snackMessage}
           anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
         />
       </Paper>

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   Box,
   Typography,
@@ -9,13 +9,54 @@ import {
 import FlipClockCountdown from "@leenguyen/react-flip-clock-countdown";
 import "@leenguyen/react-flip-clock-countdown/dist/index.css";
 import ItemCard from "./ItemCard";
+import axios from "axios";
 
-const MissionSection = () => {
-  const goal = 2665850;
-  const raised = 950000;
-  const percent = Math.min((raised / goal) * 100, 100).toFixed(1);
+const MissionSection = ({ setFormData }) => {
+  const [items, setItems] = useState([]);
+  const [raised, setRaised] = useState(0);
+  const [goal, setGoal] = useState(0);
+
   const theme = useTheme();
   const isSmallScreen = useMediaQuery(theme.breakpoints.down("sm"));
+
+  const handleDonateClick = (itemName) => {
+    setFormData((prev) => ({ ...prev, item: itemName }));
+    const formEl = document.getElementById("donation");
+    if (formEl) {
+      formEl.scrollIntoView({ behavior: "smooth" });
+    }
+  };
+
+  useEffect(() => {
+    const fetchItems = async () => {
+      try {
+        const res = await axios.get(
+          "https://fundraisebackend.onrender.com/api/items"
+        );
+        const fetchedItems = res.data;
+
+        setItems(fetchedItems);
+
+        const totalRaised = fetchedItems.reduce(
+          (sum, item) => sum + (item.amountRaised || 0),
+          0
+        );
+        const totalGoal = fetchedItems.reduce(
+          (sum, item) => sum + (item.price || 0),
+          0
+        );
+
+        setRaised(totalRaised);
+        setGoal(totalGoal);
+      } catch (err) {
+        console.error("Failed to fetch items", err);
+      }
+    };
+
+    fetchItems();
+  }, []);
+
+  const percent = goal ? Math.min((raised / goal) * 100, 100).toFixed(1) : 0;
 
   return (
     <Box sx={{ py: 6, px: 2, textAlign: "center", bgcolor: "#f5f5f5" }}>
@@ -58,12 +99,10 @@ const MissionSection = () => {
                 maxWidth: "100%",
               }}
             />
-
             <Typography
               sx={{
                 color: "white",
                 fontSize: { xs: 10, sm: 12 },
-                // fontWeight: "bold",
                 mt: -3,
                 px: 1,
                 borderRadius: 1,
@@ -89,6 +128,7 @@ const MissionSection = () => {
           }}
         />
       </Box>
+
       <Box
         sx={{
           display: "flex",
@@ -116,14 +156,8 @@ const MissionSection = () => {
         </Typography>
       </Box>
 
-      {/* Progress Bar */}
-
       {/* Countdown */}
-      <Box
-        sx={{
-          mt: 10,
-        }}
-      >
+      <Box sx={{ mt: 10 }}>
         <Box
           sx={{
             display: "flex",
@@ -151,6 +185,7 @@ const MissionSection = () => {
           />
         </Box>
       </Box>
+
       <Typography
         sx={{
           mt: 12,
@@ -162,6 +197,7 @@ const MissionSection = () => {
       >
         Essential Items
       </Typography>
+
       <Box
         sx={{
           display: "grid",
@@ -171,35 +207,17 @@ const MissionSection = () => {
           mx: 1,
         }}
       >
-        <ItemCard
-          image="/components/chasuble.jpg"
-          title="Chasuble (X4)"
-          contributors={5}
-          goal={500000}
-          raised={300000}
-        />
-        <ItemCard
-          image="/components/habit.jpg"
-          title="Habit material"
-          contributors={3}
-          goal={300000}
-          raised={250000}
-        />
-        <ItemCard
-          image="/components/habit.jpg"
-          title="Habit material"
-          contributors={3}
-          goal={300000}
-          raised={250000}
-        />
-        <ItemCard
-          image="/components/habit.jpg"
-          title="Habit material"
-          contributors={3}
-          goal={300000}
-          raised={250000}
-        />
-        {/* Add more as needed */}
+        {items?.map((item, idx) => (
+          <ItemCard
+            key={idx}
+            image={item?.image || "/components/default.jpg"}
+            title={item?.name}
+            contributors={item?.contributors}
+            goal={item?.price}
+            raised={item?.amountRaised}
+            onDonateClick={handleDonateClick}
+          />
+        ))}
       </Box>
     </Box>
   );

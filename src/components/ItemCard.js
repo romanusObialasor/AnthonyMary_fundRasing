@@ -10,7 +10,14 @@ import {
 } from "@mui/material";
 import PeopleIcon from "@mui/icons-material/People";
 
-const ItemCard = ({ image, title, contributors, goal, raised }) => {
+const ItemCard = ({
+  image,
+  title,
+  contributors,
+  goal,
+  raised,
+  onDonateClick,
+}) => {
   const percent = Math.min((raised / goal) * 100, 100).toFixed(1);
 
   return (
@@ -26,7 +33,11 @@ const ItemCard = ({ image, title, contributors, goal, raised }) => {
         >
           <Typography
             variant="h6"
-            sx={{ fontWeight: "bold", fontFamily: "playfair" }}
+            sx={{
+              fontWeight: "bold",
+              fontFamily: "playfair",
+              textAlign: "left",
+            }}
           >
             {title}
           </Typography>
@@ -39,7 +50,7 @@ const ItemCard = ({ image, title, contributors, goal, raised }) => {
               color: "white",
             }}
           >
-            ₦{raised.toLocaleString()}
+            ₦{goal.toLocaleString()}
           </Typography>
         </Box>
         <Box
@@ -131,6 +142,7 @@ const ItemCard = ({ image, title, contributors, goal, raised }) => {
               padding: "5px 20px",
               "&:hover": { backgroundColor: "#fef9e7" },
             }}
+            onClick={() => onDonateClick(title)}
           >
             Donate
           </Button>
