@@ -139,9 +139,9 @@ const MissionSection = () => {
             showSeparators
             showLabels
             digitBlockStyle={{
-              width: isSmallScreen ? 40 : 70,
-              height: isSmallScreen ? 60 : 100,
-              fontSize: isSmallScreen ? 36 : 70,
+              width: isSmallScreen ? 30 : 70,
+              height: isSmallScreen ? 50 : 100,
+              fontSize: isSmallScreen ? 26 : 70,
               backgroundColor: "white",
               color: "black",
               fontFamily: "playfair",

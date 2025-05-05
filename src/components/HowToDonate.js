@@ -97,11 +97,26 @@ const HowToDonate = () => {
 /* ---------- Small helper components ---------- */
 
 const DetailRow = ({ label, value }) => (
-  <Box sx={{ display: "flex", justifyContent: "space-between" }}>
+  <Box
+    sx={{
+      display: "flex",
+      flexDirection: { xs: "column", sm: "row" },
+      justifyContent: "space-between",
+      alignItems: { sm: "center" },
+      gap: 0.5,
+    }}
+  >
     <Typography variant="body2" color="text.secondary">
       {label}
     </Typography>
-    <Typography variant="body2" fontWeight={500}>
+    <Typography
+      variant="body2"
+      fontWeight={500}
+      sx={{
+        wordBreak: "break-word",
+        textAlign: { xs: "left", sm: "right" },
+      }}
+    >
       {value}
     </Typography>
   </Box>

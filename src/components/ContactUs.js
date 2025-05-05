@@ -13,7 +13,7 @@ import PhoneIcon from "@mui/icons-material/Phone";
 const ContactUs = () => {
   const [snackOpen, setSnackOpen] = useState(false);
 
-  const phoneNumber = "08012345678"; // Replace with your actual number
+  const phoneNumber = "07030707996"; // Replace with your actual number
   const whatsappLink = `https://wa.me/2348012345678`; // International format
 
   const handleCopyPhone = () => {
